@@ -1,17 +1,11 @@
 const config = require('../core/config.json');
-const { Util } = require('discord.js');
+const Discord = require('discord.js');
 
-// Media
-const ytdl = require('ytdl-core');
 const scdl = require('soundcloud-downloader').default;
-
-// APIs & Keys
-const YouTube = require('simple-youtube-api');
-const youtube = new YouTube(config.GOOGLE_API_KEY);
+const soundcloud = config.SOUNDCLOUD_CLIENT_ID;
 
 module.exports = {
-    name: 'play',
-    aliasses: ['p'],
+    name: 'soundcloud',
     async execute(message, args) {
         // some permissions in case of stuff happening.
         const vChannel = message.member.voice.channel;
@@ -28,21 +22,12 @@ module.exports = {
         if(!permissions.has('SPEAK')) 
             return message.reply("I don't have permissions to speak in the channel");
         if(!args.length) 
-            return message.reply(`Usage: ${config.prefix}play <soundcloud.url> or <youtube.url/name>`).catch(console.error);
-
-        // code for the ability to search songs by name
-        const search = args.join(" ");
-        const url = args[0];
-
-        // code for youtube links
-        const videoPattern = /^(https?:\/\/)?(www\.)?(m\.)?(youtube\.com|youtu\.?be)\/.+$/gi;
-        const playlistPattern = /^.*(list=)([^#\&\?]*).*/gi;
-            
-        const urlValid = videoPattern.test(args[0]);
+            return message.reply(`Usage: ${config.prefix}play <youtube.url/name>`).catch(console.error);
 
         const scRegex = /^https?:\/\/(soundcloud\.com)\/(.*)$/;
+        const url = args[0];
 
-        const COOKIE = 'SID=5wexVlzYZ1v1GIwjR4f2v39zZ9SRrB-AtzuZQzUKKOabB5EO0-rzeW5cpldbVM_eoax8HQ.; APISID=WUYodWPnOnRhTFjz/AyjpbeHyvq-7Ruau4; SAPISID=J95PtBtgQI5YUtLh/AO2v_B3eKuhc6zTw-; SIDCC=AJi4QfEUM-JsrpRW-kpKe6m5V-hafFRCk5AaTNvPfvIubnQH5RMGs6yYaCto4f0sY5cgEKb78z8';
+
 
         const queueConstruct = {
             textChannel: message.channel,
@@ -53,46 +38,11 @@ module.exports = {
             playing: true
         };
 
-        if(!videoPattern.test(args[0]) && playlistPattern.test(args[0])){
-            return message.client.commands.get("playlist").execute(message, args).catch(console.error());
-        };
-
-        if(scRegex.test(url)) {
-            return message.client.commands.get("soundcloud").execute(message, args).catch(console.error());
-        };
-
-        // if the URL is valid this code will get info from the URL
-        if(urlValid) {
-            try {
-                songInfo = await ytdl.getInfo(url, {
-                    requestOptions: {
-                        headers: {
-                            cookie: COOKIE
-                        },
-                    },
-                });
-                song = {
-                    title: Util.escapeMarkdown(songInfo.videoDetails.title),
-                    url: songInfo.videoDetails.video_url,
-                    duration: songInfo.videoDetails.video_url
-                }
-            } catch(error) {
-                console.error(error);
-                return message.reply(`${error.message ? error.message : error}`);
-            }
-        } else {
-            try {
-                const results = await youtube.searchVideos(search, 1);
-                songInfo = await ytdl.getInfo(results[0].url);
-                song = {
-                    title: Util.escapeMarkdown(songInfo.videoDetails.title),
-                    duration: songInfo.videoDetails.lengthSeconds,
-                    url: songInfo.videoDetails.video_url
-                };
-            } catch(error) {
-                console.error(error);
-                return message.reply(`${error.message ? error.message : error}`);
-            };
+        const track = await scdl.getInfo(url, soundcloud);
+        song = {
+            title: track.title,
+            url: track.permalink_url,
+            duration: Math.ceil(track.duration / 1000)
         };
 
         if(sQueue) {
@@ -116,15 +66,20 @@ module.exports = {
                 return message.client.queue.delete(message.guild.id)
             };
 
+            let stream = null;
+
+            if(song.url.includes('soundcloud.com')) {
+                try {
+                    stream = await scdl.downloadFormat(song.url, scdl.FORMATS.OPUS, soundcloud);
+                } catch(error) {
+                    stream = await scdl.downloadFormat(song.url, scdl.FORMATS.MP3, soundcloud);
+                    streamType = "unknown";
+                };
+            };
+
             const connection = await vChannel.join();
             const dispatcher = connection
-                .play(ytdl(song.url, {
-                    filter: 'audioonly',
-                    quality: 'highestaudio',
-                    opusEncoded: true,
-                    type: 'opus',
-                    highWaterMark: 1 << 25
-                }))
+                .play(stream)
                 .on('finish', () => {
                     if(queue.loop) {
                         let lastSong = queue.songs.shift();
@@ -140,8 +95,8 @@ module.exports = {
                     queue.songs.shift();
                 });
 
-            dispatcher.setVolumeLogarithmic(config.volume / 100);
-            message.channel.send(`**${song.title}** is now playing in the ${vChannel} channel!`);
+                dispatcher.setVolumeLogarithmic(config.volume / 100);
+                message.channel.send(`**${song.title}** is now playing in the ${vChannel} channel!`);
         };
 
         try{

@@ -1,20 +1,17 @@
 const Discord = require('discord.js');
-const config = require('../core/config.json');
+const info = require('../core/info.json');
 
 module.exports = {
     name: 'patch',
     category: 'Debug',
     description: 'This command displays the most recent patch of the bot!',
     execute (message) {
-        const author = message.author.username;
-
         const embed = new Discord.MessageEmbed()
             .setColor('RANDOM')
-            .setTitle('EUTERA: 2.3.0 PATCH')
+            .setTitle(`${info.name}: ${info.version}`)
             .setDescription('PATCH NOTES:')
-            .addField('● Fixed the play command.', 'Just that.')
-            .addField('● Changed some args in the play command.', 'Should sound the same or better.')
-            .addField('● Getting ready to re-work some commands.', 'Dev stuff, don\'t worry about it!')
+            .addField('● GENERAL:', 'Added the remove command and the ability to skip more songs at once!')
+            .addField('● OTHER TWEAKS:', 'Changed the queue limit to 2800 songs!')
             .setTimestamp();
             message.channel.send(embed).catch(console.error);
     }

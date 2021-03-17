@@ -10,6 +10,6 @@ module.exports = {
                 return message.reply("there is nothing playing!");
 
         serverQueue.loop = !serverQueue.loop;
-        return message.channel.send(`\`${message.author.username}\` the loop is now ${serverQueue.loop ? "**on**" : "**off**"}`).catch(console.error);
+        return message.channel.send(`\`${message.author.username}\` ${serverQueue.loop ? "**enabled**" : "**disabled**"} the loop! `).catch(console.error);
     }
 };

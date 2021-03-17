@@ -3,7 +3,6 @@
     "pool": "pool",
     "ping": "ping",
     "patch": "patch",
-    "status": "status",
 
     "play": "play",
     "stop": "stop",

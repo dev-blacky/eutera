@@ -1,3 +1,5 @@
+const { Guild } = require("discord.js");
+
 module.exports = {
     name: 'clear',
     aliases: ['cl'],
@@ -15,7 +17,6 @@ module.exports = {
         await message.channel.messages.fetch({limit: args[0]})
             .then(messages => {
                 message.channel.bulkDelete(args[0]);
-                console.log(args[0] + " " + 'messages deleted by:' + " " + message.author.username);
             }).catch(console.error);
     }
 };
