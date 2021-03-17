@@ -9,7 +9,7 @@
     "volume": 50,
     "MAX_PLAYLIST_SIZE": 2800,
 
-    "token": "NzcyOTQ0NjQ2MTk1NTExMjk3.X6CCzA.BYpbdyJzsH-97SW0quWjOw0gCeU",
-    "GOOGLE_API_KEY": "AIzaSyDVLVRluEH24p7r-p8Ol932QjVpYdoUKTI",
-    "SOUNDCLOUD_CLIENT_ID": "NkLPPSvHGOiqQXv6TjDJGXvCoUOGIGUu"
+    "token": "",
+    "GOOGLE_API_KEY": "",
+    "SOUNDCLOUD_CLIENT_ID": ""
 }
