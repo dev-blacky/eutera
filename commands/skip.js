@@ -15,7 +15,7 @@ module.exports = {
             songName = serverQueue.songs[0].title;
 
             serverQueue.connection.dispatcher.end();
-            message.channel.send(`**${songName}** was skipped by \`${message.author.username}\``);
+            message.channel.send(`\`${songName}\` was skipped by \`${message.author.username}\``);
         } else {
             const voiceChannel = message.member.voice.channel;
             if(!voiceChannel)
@@ -30,6 +30,7 @@ module.exports = {
 
             const song = serverQueue.songs.splice(1, args[0]);
             serverQueue.textChannel.send(`\`${message.author.username}\`` + ' removed ' + `${args[0]}` + ' songs.');
+            console.log(`\`${message.author.username}\`` + ' removed ' + `${args[0]}` + ` songs in channel ${voiceChannel} of ${message.guild.name}.`)
         };
     }
 };

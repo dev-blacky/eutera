@@ -18,7 +18,7 @@ module.exports = {
                 return message.reply('please specify the queue number!').catch(console.error);
 
             const song = serverQueue.songs.splice(args[0] - 1, 1);
-            serverQueue.textChannel.send(`**${song[0].title}** was removed from the queue \`${message.author.username}\``);
+            serverQueue.textChannel.send(`\`${song[0].title}\` was removed from the queue \`${message.author.username}\``);
         };
     }
 };

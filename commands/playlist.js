@@ -36,6 +36,7 @@ module.exports = {
             connection: null,
             songs: [],
             loop: false,
+            volume: 50,
             playing: true
         };
 
@@ -75,15 +76,11 @@ module.exports = {
 
         let playlistEmbed = new Discord.MessageEmbed()
             .setTitle(`${playlist.title}`)
-            .setDescription(newSongs.map((song, index) => `${index + 1}. ${song.title}`))
             .setURL(playlist.url)
             .setColor("#F8AA2A")
             .setTimestamp();
-
-        if (playlistEmbed.description.length >= 2048)
-            playlistEmbed.description = playlistEmbed.description.substr(0, 2007) + `Playlist larger than character limit...`;
             
-        message.channel.send(`${message.author} has started a playlist`, playlistEmbed);
+        message.channel.send(`\`${message.author.username}\` has started a playlist`, playlistEmbed);
         
         if(!sQueue) {
             message.client.queue.set(message.guild.id, queueConstruct);
@@ -123,8 +120,8 @@ module.exports = {
                         queue.songs.shift();
                     });
     
-                dispatcher.setVolumeLogarithmic(config.volume / 100);
-                message.channel.send(`**${song.title}** is now playing in the ${vChannel} channel!`);
+                dispatcher.setVolumeLogarithmic(queue.volume / 100);
+                message.channel.send(`\`${song.title}\` is now playing in the ${vChannel} channel!`);
             };
 
             try{

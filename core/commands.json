@@ -9,8 +9,6 @@
     "pause": "pause",
     "resume": "resume",
     "skip": "skip",
-    "volume": "volume",
-    "shuffle": "shuffle",
     "queue": "queue",
     "remove": "remove",
     "now": "now",

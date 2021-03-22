@@ -17,6 +17,7 @@ module.exports = {
         await message.channel.messages.fetch({limit: args[0]})
             .then(messages => {
                 message.channel.bulkDelete(args[0]);
+                console.log('SYSTEM:' + ' ' + `${message.author.username} deleted ${args[0]} messages in ${message.guild.name}!`);
             }).catch(console.error);
     }
 };

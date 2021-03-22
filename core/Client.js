@@ -1,13 +1,14 @@
 const { Client, Collection } = require('discord.js');
 
-module.exports = class extends Client {
-    constructor(client_config) {
+class client extends Client {
+    constructor() {
         super ({
             disableMentions: 'everyone'
         });
 
         this.commands = new Collection();
-
-		this.queue = new Map();
+        this.queue = new Map();
     }
-}
+};
+
+module.exports = client;

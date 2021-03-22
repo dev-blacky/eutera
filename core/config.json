@@ -1,13 +1,10 @@
 {
     "activity": "-help",
-    "prefix": "-",
 
-    "core_version": "12.5.1",
-    "ytdl_version": "4.5.0",
     "dev_feedback": "https://xwhiteline.github.io/pages/feedback.html",
 
-    "volume": 50,
-    "MAX_PLAYLIST_SIZE": 2800,
+    "MAX_PLAYLIST_SIZE": 3000,
+    "MONGO_PATH": "",
 
     "token": "",
     "GOOGLE_API_KEY": "",

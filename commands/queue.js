@@ -1,26 +1,55 @@
-const config = require("../core/config.json");
 const Discord = require('discord.js');
 
 module.exports = {
     name: 'queue',
     aliases: ['q'],
     category: 'music',
-    execute (message) {
-        const vChannel = message.member.voice.channel;
-        const serverQueue = message.client.queue.get(message.guild.id);
-            if(!serverQueue)
-                return message.reply("there is nothing playing");
+    async execute (message, args) {
+        const sQueue = message.client.queue.get(message.guild.id);
+            if(!sQueue)
+                return message.reply("there is nothing playing");        
 
-        const embed = new Discord.MessageEmbed()
-            .setColor('RANDOM')
-            .setTitle(`QUEUE`)
-            .setDescription(serverQueue.songs.map((song, index) => `${index + 1}. ${song.title}`))
-            .setTimestamp();
+        let currentPage = 0;
+        const embeds = generator(sQueue);
 
-        if (embed.description.length >= 2048)
-            embed.description = embed.description.substr(0, 2007) + "\nQueue larger than character limit...";
+        const queueEmbed = await message.channel.send(`Queue page: ${currentPage+1}/${embeds.length}`, embeds[currentPage])
+            await queueEmbed.react('⬅️');
+            await queueEmbed.react('➡️');
 
-        message.channel.send(embed).catch(console.error);
-        message.channel.send(`**Now Playing:** ${serverQueue.songs[0].title} in the ${vChannel} channel!`, {split: true});
+        const reactionFilter = (reaction, user) => ['⬅️', '➡️'].includes(reaction.emoji.name) && (message.author.id === user.id)
+        const collector = queueEmbed.createReactionCollector(reactionFilter);
+
+        collector.on('collect', (reaction, user) => {
+            if(reaction.emoji.name === '➡️'){
+                if(currentPage < embeds.length-1){
+                    currentPage+=1;
+                    queueEmbed.edit(`Lyrics page: ${currentPage+1}/${embeds.length}`, embeds[currentPage]);
+                    message.reactions.resolve(reaction).users.remove(user);
+                }
+            } else if(reaction.emoji.name === '⬅️') {
+                if(currentPage !== 0){
+                    currentPage-=1;
+                    queueEmbed.edit(`Lyrics page: ${currentPage+1}/${embeds.length}`, embeds[currentPage]);
+                    message.reactions.resolve(reaction).users.remove(user);
+                }
+            };
+        });
+
+        message.channel.send(`**Now Playing:** \`${sQueue.songs[0].title}\``, {split: true});
     }
 };
+
+function generator(sQueue){
+    const embeds = [];
+    let songs = 10;
+    for (let l = 0; l < sQueue.songs.length; l += 10) {
+        const current = sQueue.songs.slice(l, songs);
+        songs += 10;
+        let j = l;
+        const info = current.map(song => `${++j}. [${song.title}](${song.url})`).join('\n');
+        const msg = new Discord.MessageEmbed()
+            .setDescription(`${info}`).setTitle('QUEUE').setAuthor('Eutera').setTimestamp();
+        embeds.push(msg);
+    };
+    return embeds;
+}

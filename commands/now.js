@@ -16,7 +16,7 @@ module.exports = {
 
         let now = new Discord.MessageEmbed()
             .setTitle('NOW PLAYING')
-            .setDescription(`${song.title}\n${song.url}`)
+            .setDescription(`${song.title}`)
             .setColor("#F8AA2A")
             .setAuthor(message.client.user.username);
 

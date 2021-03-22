@@ -48,7 +48,7 @@ module.exports = {
         if(sQueue) {
             sQueue.songs.push(song);
             return sQueue.textChannel
-                .send(`**${song.title}** has been added to the queue by \`${message.author.username}\``)
+                .send(`\`${song.title}\` has been added to the queue by \`${message.author.username}\``)
                 .catch(console.error);
         };
 
@@ -96,7 +96,7 @@ module.exports = {
                 });
 
                 dispatcher.setVolumeLogarithmic(config.volume / 100);
-                message.channel.send(`**${song.title}** is now playing in the ${vChannel} channel!`);
+                message.channel.send(`\`${song.title}\` is now playing in the ${vChannel} channel!`);
         };
 
         try{

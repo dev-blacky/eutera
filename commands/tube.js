@@ -1,28 +1,20 @@
 const config = require('../core/config.json');
-const { Util } = require('discord.js');
+const {Util} = require('discord.js');
 
-// Media
 const ytdl = require('ytdl-core');
-const scdl = require('soundcloud-downloader').default;
-
-// APIs & Keys
 const YouTube = require('simple-youtube-api');
 const youtube = new YouTube(config.GOOGLE_API_KEY);
 
 module.exports = {
-    name: 'play',
-    aliases: ['p'],
-    async execute(message, args) {
-        // some permissions in case of stuff happening.
-        const vChannel = message.member.voice.channel;
-        if(!vChannel) {
+	name: 'tube',
+	async execute(message, args) {
+	    const vChannel = message.member.voice.channel;
+        if(!vChannel) 
             return message.reply(`you need to be in a voice channel to play music`).catch(console.error);
-        };
-            
+
         const sQueue = message.client.queue.get(message.guild.id);
-        if (sQueue && vChannel !== message.guild.me.voice.channel) {
+        if (sQueue && vChannel !== message.guild.me.voice.channel) 
             return message.reply(`you must be in the same channel as ${message.client.user}`).catch(console.error);
-        };
 
         const permissions = vChannel.permissionsFor(message.client.user);
         if(!permissions.has('CONNECT')) 
@@ -35,13 +27,9 @@ module.exports = {
         const search = args.join(" ");
         const url = args[0];
 
-        // code for youtube links
         const videoPattern = /^(https?:\/\/)?(www\.)?(m\.)?(youtube\.com|youtu\.?be)\/.+$/gi;
-        const playlistPattern = /^.*(list=)([^#\&\?]*).*/gi;
             
         const urlValid = videoPattern.test(args[0]);
-
-        const scRegex = /^https?:\/\/(soundcloud\.com)\/(.*)$/;
 
         const COOKIE = 'SID=5wexVlzYZ1v1GIwjR4f2v39zZ9SRrB-AtzuZQzUKKOabB5EO0-rzeW5cpldbVM_eoax8HQ.; APISID=WUYodWPnOnRhTFjz/AyjpbeHyvq-7Ruau4; SAPISID=J95PtBtgQI5YUtLh/AO2v_B3eKuhc6zTw-; SIDCC=AJi4QfEUM-JsrpRW-kpKe6m5V-hafFRCk5AaTNvPfvIubnQH5RMGs6yYaCto4f0sY5cgEKb78z8';
 
@@ -51,19 +39,9 @@ module.exports = {
             connection: null,
             songs: [],
             loop: false,
-            volume: 50,
             playing: true
         };
 
-        if(!videoPattern.test(args[0]) && playlistPattern.test(args[0])){
-            return message.client.commands.get("playlist").execute(message, args).catch(console.error());
-        };
-
-        if(scRegex.test(url)) {
-            return message.client.commands.get("soundcloud").execute(message, args).catch(console.error());
-        };
-
-        // if the URL is valid this code will get info from the URL
         if(urlValid) {
             try {
                 songInfo = await ytdl.getInfo(url, {
@@ -99,9 +77,8 @@ module.exports = {
 
         if(sQueue) {
             sQueue.songs.push(song);
-            console.log('SYSTEM:' + ' ' + `${song.title} has been added to the queue by \`${message.author.username}\` in ${message.guild.name}`);
             return sQueue.textChannel
-                .send(`\`${song.title}\` \`(${new Date (song.duration * 1000).toISOString().substr(11,8)})\` has been added to the queue by \`${message.author.username}\``)
+                .send(`**${song.title}** has been added to the queue by \`${message.author.username}\``)
                 .catch(console.error);
         };
 
@@ -143,9 +120,8 @@ module.exports = {
                     queue.songs.shift();
                 });
 
-            dispatcher.setVolumeLogarithmic(queue.volume / 100);
-            message.channel.send(`\`${song.title}\` \`(${new Date (song.duration * 1000).toISOString().substr(11,8)})\` is now playing in the ${vChannel} channel!`);
-            console.log('SYSTEM:' + ' ' + `${song.title} requested by ${message.author.username} is now playing in the ${vChannel} of ${message.guild.name}`);
+            dispatcher.setVolumeLogarithmic(config.volume / 100);
+            message.channel.send(`**${song.title}** is now playing in the ${vChannel} channel!`);
         };
 
         try{
@@ -158,5 +134,5 @@ module.exports = {
             await voiceChannel.leave();
             return message.reply(`I could not join the voice channel: ${error}`);
         };
-    }
+	}
 };
