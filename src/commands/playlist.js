@@ -45,6 +45,7 @@ module.exports = {
         
         if (urlValid) {
             try {
+                
                 playlist = await youtube.getPlaylist(url, { part: "snippet" });
                 videos = await playlist.getVideos(MAX_PLAYLIST_SIZE || 10, { part: "snippet" });
             } catch (error) {
@@ -119,6 +120,8 @@ module.exports = {
                         console.error(error);
                         queue.songs.shift();
                     });
+
+                connection.on('disconnect', () => message.client.queue.delete(message.guild.id));
     
                 dispatcher.setVolumeLogarithmic(queue.volume / 100);
                 message.channel.send(`\`${song.title}\` is now playing in the ${vChannel} channel!`);

@@ -76,7 +76,7 @@ module.exports = {
                 song = {
                     title: Util.escapeMarkdown(songInfo.videoDetails.title),
                     url: songInfo.videoDetails.video_url,
-                    duration: songInfo.videoDetails.video_url
+                    duration: songInfo.videoDetails.lengthSeconds
                 }
             } catch(error) {
                 console.error(error);
@@ -99,7 +99,7 @@ module.exports = {
 
         if(sQueue) {
             sQueue.songs.push(song);
-            console.log('SYSTEM:' + ' ' + `${song.title} has been added to the queue by \`${message.author.username}\` in ${message.guild.name}`);
+            console.log('SYSTEM:' + ' ' + `${song.title} has been added to the queue by ${message.author.username} in ${message.guild.name}`);
             return sQueue.textChannel
                 .send(`\`${song.title}\` \`(${new Date (song.duration * 1000).toISOString().substr(11,8)})\` has been added to the queue by \`${message.author.username}\``)
                 .catch(console.error);
@@ -143,8 +143,10 @@ module.exports = {
                     queue.songs.shift();
                 });
 
+            connection.on('disconnect', () => message.client.queue.delete(message.guild.id));
+
             dispatcher.setVolumeLogarithmic(queue.volume / 100);
-            message.channel.send(`\`${song.title}\` \`(${new Date (song.duration * 1000).toISOString().substr(11,8)})\` is now playing in the ${vChannel} channel!`);
+            message.channel.send(`\`${song.title}\` \`(${new Date (queue.songs[0].duration * 1000).toISOString().substr(11,8)})\` is now playing in the ${vChannel} channel!`);
             console.log('SYSTEM:' + ' ' + `${song.title} requested by ${message.author.username} is now playing in the ${vChannel} of ${message.guild.name}`);
         };
 
