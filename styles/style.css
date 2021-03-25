@@ -14,22 +14,13 @@
     position: relative;
 }
 
-.circle-box {
+.background {
     position: absolute;
     height: 450px;
     width: 450px;
 
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%)
-}
-
-svg {
-    position: absolute;
-
-    top: 50%;
-    left: 50%;
-
     transform: translate(-50%, -50%);
 }
 
@@ -37,7 +28,7 @@ svg {
     width: 350px;
     position: absolute;
 
-    top: 80px;
+    top: 100px;
     left: 50px;
 
     color: white;
